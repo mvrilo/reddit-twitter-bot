@@ -14,6 +14,8 @@ import (
 
 var twitter *anaconda.TwitterApi
 var titles []string
+var subreddit *string
+var hot *bool
 
 type datum struct {
 	ID        string
@@ -48,7 +50,11 @@ func store(d datum) {
 }
 
 func get(subreddit string) (data []datum) {
-	res, err := http.Get("https://www.reddit.com/r/" + subreddit + "/new.json?limit=100")
+	kind := "new"
+	if *hot {
+		kind = "hot"
+	}
+	res, err := http.Get("https://www.reddit.com/r/" + subreddit + "/" + kind + ".json?limit=100")
 	if err != nil {
 		panic(err)
 	}
@@ -88,8 +94,9 @@ func main() {
 	secret := flag.String("secret", "", "Twitter API consumer secret")
 	accessToken := flag.String("access_token", "", "Twitter access key")
 	accessSecret := flag.String("access_secret", "", "Twitter access secret")
-	subreddit := flag.String("subreddit", "", "Subreddit to watch")
-	timer := flag.Int("time", 30, "Time to fetch for new posts")
+	subreddit = flag.String("subreddit", "", "Subreddit to watch")
+	timer := flag.Int("time", 30, "Time in seconds to fetch for posts")
+	hot = flag.Bool("hot", false, "Lookup for hot posts instead of new")
 	flag.Parse()
 
 	if *subreddit == "" {
