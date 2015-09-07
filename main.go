@@ -56,13 +56,15 @@ func get(subreddit string) (data []datum) {
 	}
 	res, err := http.Get("https://www.reddit.com/r/" + subreddit + "/" + kind + ".json?limit=100")
 	if err != nil {
-		panic(err)
+		log.Println(err)
+		return
 	}
 	defer res.Body.Close()
 
 	body, err := ioutil.ReadAll(res.Body)
 	if err != nil {
-		panic(err)
+		log.Println(err)
+		return
 	}
 
 	var resp response
